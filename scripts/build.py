@@ -221,7 +221,27 @@ def fetch_epss(cves: list[str]) -> dict[str, dict]:
     return scores
 
 
+_NPM_BULK: dict[str, int] = {}
+
+
+def prefetch_npm_downloads(names: list[str]) -> None:
+    """npm's bulk endpoint takes up to 128 unscoped names per call."""
+    plain = sorted({n for n in names if not n.startswith("@") and n not in _NPM_BULK})
+    for i in range(0, len(plain), 128):
+        chunk = plain[i:i + 128]
+        try:
+            d = http_json(NPM_DL + ",".join(urllib.parse.quote(n, safe="") for n in chunk), ttl=24 * 3600)
+        except Exception as e:  # noqa: BLE001
+            print(f"warn: npm bulk downloads failed: {e}", file=sys.stderr)
+            continue
+        for n in chunk:
+            row = d.get(n) if isinstance(d, dict) else None
+            _NPM_BULK[n] = int((row or {}).get("downloads") or 0)
+
+
 def monthly_downloads(ecosystem: str, name: str) -> int | None:
+    if ecosystem == "npm" and name in _NPM_BULK:
+        return _NPM_BULK[name]
     try:
         if ecosystem == "npm":
             d = http_json(NPM_DL + urllib.parse.quote(name, safe="@/"), ttl=24 * 3600)
@@ -680,6 +700,10 @@ def live_sources() -> dict:
     print("fetching GitHub advisories…", file=sys.stderr)
     ghsa = fetch_ghsa("reviewed", CRITICAL_DAYS, "critical")
     malware = fetch_ghsa("malware", MALWARE_DAYS, None)
+    print(f"checking downloads for {len(malware)} malware advisories…", file=sys.stderr)
+    prefetch_npm_downloads([(v.get("package") or {}).get("name", "")
+                            for a in malware for v in a.get("vulnerabilities") or []
+                            if (v.get("package") or {}).get("ecosystem") == "npm"])
     return {"kev": kev, "nvd": nvd, "ghsa": ghsa, "malware": malware,
             "nvd_lookup": fetch_nvd_one, "epss": fetch_epss, "downloads": monthly_downloads}
 
