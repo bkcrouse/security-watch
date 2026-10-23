@@ -26,12 +26,10 @@
     "first_patched_version": "15.5.28"
    }
   ],
-  "epss": [
-   {
-    "percentage": 0.0032,
-    "percentile": 0.24
-   }
-  ]
+  "epss": {
+   "percentage": 0.0032,
+   "percentile": 0.24
+  }
  },
  {
   "ghsa_id": "GHSA-aaaa-bbbb-cccc",
@@ -60,12 +58,10 @@
     "first_patched_version": "13.0.0"
    }
   ],
-  "epss": [
-   {
-    "percentage": 0.0032,
-    "percentile": 0.24
-   }
-  ]
+  "epss": {
+   "percentage": 0.0032,
+   "percentile": 0.24
+  }
  },
  {
   "ghsa_id": "GHSA-dddd-eeee-ffff",
@@ -94,11 +90,9 @@
     "first_patched_version": "8.4.27"
    }
   ],
-  "epss": [
-   {
-    "percentage": 0.0032,
-    "percentile": 0.24
-   }
-  ]
+  "epss": {
+   "percentage": 0.0032,
+   "percentile": 0.24
+  }
  }
 ]

@@ -412,10 +412,12 @@ def from_ghsa(adv: dict) -> dict:
         "sources": ["GitHub"],
         "url": adv.get("html_url") or f"https://github.com/advisories/{adv['ghsa_id']}",
     }
-    epss = adv.get("epss") or []
-    if epss and epss[0].get("percentage") is not None:
-        rec["epss"] = float(epss[0]["percentage"])
-        rec["epssPct"] = float(epss[0].get("percentile") or 0)
+    epss = adv.get("epss")
+    if isinstance(epss, list):          # tolerate either shape
+        epss = epss[0] if epss else None
+    if isinstance(epss, dict) and epss.get("percentage") is not None:
+        rec["epss"] = float(epss["percentage"])
+        rec["epssPct"] = float(epss.get("percentile") or 0)
     return rec
 
 
