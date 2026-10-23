@@ -214,6 +214,22 @@ function wire() {
   });
 }
 
+function themes() {
+  const KEY = "security-watch:theme";
+  const btns = document.querySelectorAll(".theme button");
+  const apply = (t) => {
+    if (t === "dark") delete document.documentElement.dataset.theme;
+    else document.documentElement.dataset.theme = t;
+    btns.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.theme === t)));
+  };
+  apply(document.documentElement.dataset.theme || "dark");
+  btns.forEach((b) => b.addEventListener("click", () => {
+    apply(b.dataset.theme);
+    try { localStorage.setItem(KEY, b.dataset.theme); } catch (_) {}
+  }));
+}
+themes();
+
 async function load() {
   try {
     const res = await fetch("data.json", { cache: "no-cache" });

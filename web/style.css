@@ -1,10 +1,44 @@
+/* Dark is the default; data-theme="medium" | "light" on <html> switches. */
 :root {
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --accent: #e2533b;
+  --bg: #121315;
+  --panel: #1a1c1f;
+  --ink: #e8e7e3;
+  --muted: #9a9ca1;
+  --line: #2b2e33;
+  --act: #ff7a63;
+  --act-bg: #3a1d18;
+  --watch: #f0b357;
+  --watch-bg: #33270f;
+  --fyi: #a7abb2;
+  --fyi-bg: #25272b;
+  --link: #7fb0ff;
+  color-scheme: dark;
+}
+:root[data-theme="medium"] {
+  --bg: #2b2e33;
+  --panel: #353940;
+  --ink: #eceae6;
+  --muted: #b0b3b9;
+  --line: #474c54;
+  --act: #ff8a75;
+  --act-bg: #4a2a24;
+  --watch: #f3be6c;
+  --watch-bg: #463720;
+  --fyi: #c0c3c9;
+  --fyi-bg: #40444b;
+  --link: #96bfff;
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  --accent: #d6452f;
   --bg: #f6f5f2;
   --panel: #ffffff;
   --ink: #1c1d1f;
   --muted: #6a6c70;
   --line: #e3e1dc;
-  --accent: #d6452f;
   --act: #c8371f;
   --act-bg: #fbe9e5;
   --watch: #a8660a;
@@ -12,27 +46,13 @@
   --fyi: #5d6168;
   --fyi-bg: #eeeeec;
   --link: #1f5fbf;
-  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
-  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   color-scheme: light;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #121315;
-    --panel: #1a1c1f;
-    --ink: #e8e7e3;
-    --muted: #9a9ca1;
-    --line: #2b2e33;
-    --act: #ff7a63;
-    --act-bg: #3a1d18;
-    --watch: #f0b357;
-    --watch-bg: #33270f;
-    --fyi: #a7abb2;
-    --fyi-bg: #25272b;
-    --link: #7fb0ff;
-    color-scheme: dark;
-  }
-}
+
+.theme { display: inline-flex; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
+.theme button { border: 0; background: none; color: var(--muted); padding: 4px 9px; font-size: 12.5px; cursor: pointer; }
+.theme button + button { border-left: 1px solid var(--line); }
+.theme button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
 
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
@@ -137,4 +157,8 @@ button.stat:hover { border-color: var(--muted); }
   .row > summary .flags { grid-column: 1 / -1; justify-content: flex-start; }
   .detail { padding-left: 14px; }
   .meta #updated { display: none; }
+  .meta { gap: 10px; }
+  .brand span { white-space: nowrap; }
+  .meta a[href="data.json"] { display: none; }
+  .theme button { padding: 4px 7px; font-size: 12px; }
 }
