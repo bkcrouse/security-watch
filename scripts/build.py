@@ -692,14 +692,41 @@ def write_rss(data: dict, path: Path, site_url: str):
     path.write_text("\n".join(out), encoding="utf-8")
 
 
+SOURCE_ERRORS: list[str] = []
+
+
+def describe(e: Exception) -> str:
+    if isinstance(e, urllib.error.HTTPError):
+        try:
+            body = e.read(300).decode("utf-8", "replace").strip()
+        except Exception:  # noqa: BLE001
+            body = ""
+        return f"HTTP {e.code} {e.reason} {e.url} {body}".strip()
+    return f"{type(e).__name__}: {e}"
+
+
+def attempt(name: str, fn, default):
+    """Run one source; on failure keep going and surface the error in CI."""
+    t0 = time.time()
+    print(f"fetching {name}…", file=sys.stderr)
+    try:
+        out = fn()
+        n = len(out.get("vulnerabilities", [])) if isinstance(out, dict) else len(out)
+        print(f"  {name}: {n} records in {time.time() - t0:.0f}s", file=sys.stderr)
+        return out
+    except Exception as e:  # noqa: BLE001
+        msg = f"{name} failed after {time.time() - t0:.0f}s: {describe(e)}"
+        SOURCE_ERRORS.append(msg)
+        # GitHub Actions turns this into an annotation on the run.
+        print(f"::warning title=Source failed::{msg}", flush=True)
+        return default
+
+
 def live_sources() -> dict:
-    print("fetching CISA KEV…", file=sys.stderr)
-    kev = fetch_kev()
-    print("fetching NVD critical…", file=sys.stderr)
-    nvd = fetch_nvd_critical()
-    print("fetching GitHub advisories…", file=sys.stderr)
-    ghsa = fetch_ghsa("reviewed", CRITICAL_DAYS, "critical")
-    malware = fetch_ghsa("malware", MALWARE_DAYS, None)
+    kev = attempt("CISA KEV", fetch_kev, {})
+    nvd = attempt("NVD critical", fetch_nvd_critical, [])
+    ghsa = attempt("GitHub critical advisories", lambda: fetch_ghsa("reviewed", CRITICAL_DAYS, "critical"), [])
+    malware = attempt("GitHub malware advisories", lambda: fetch_ghsa("malware", MALWARE_DAYS, None), [])
     print(f"checking downloads for {len(malware)} malware advisories…", file=sys.stderr)
     prefetch_npm_downloads([(v.get("package") or {}).get("name", "")
                             for a in malware for v in a.get("vulnerabilities") or []
@@ -731,6 +758,10 @@ def main():
     overrides = load_json(ROOT / "overrides.json", {})
     watchlist = load_json(ROOT / "watchlist.json", [])
     data = build(raw, overrides, watchlist)
+    data["sourceErrors"] = SOURCE_ERRORS
+    if not data["items"] and SOURCE_ERRORS:
+        print("::error::every source failed; not deploying an empty site", flush=True)
+        sys.exit(1)
 
     out = Path(args.out)
     if out.exists():
@@ -745,4 +776,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception:  # surface the traceback as a CI annotation, then fail
+        import traceback
+        tb = traceback.format_exc()
+        print("::error title=Build crashed::" + tb.strip().replace("\n", "%0A"), flush=True)
+        raise
