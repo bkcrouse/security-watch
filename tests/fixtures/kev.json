@@ -1,0 +1,37 @@
+{
+ "vulnerabilities": [
+  {
+   "cveID": "CVE-2026-114625",
+   "vendorProject": "Arista",
+   "product": "VeloCloud Orchestrator",
+   "vulnerabilityName": "Arista VeloCloud Orchestrator SQL Injection Vulnerability",
+   "dateAdded": "2026-10-23",
+   "shortDescription": "VeloCloud Orchestrator on-prem allows any authenticated user to gain operator privileges.",
+   "requiredAction": "Apply mitigations per vendor instructions or discontinue use.",
+   "dueDate": "2026-10-26",
+   "knownRansomwareCampaignUse": "Unknown"
+  },
+  {
+   "cveID": "CVE-2026-90001",
+   "vendorProject": "Fortinet",
+   "product": "FortiOS",
+   "vulnerabilityName": "Fortinet FortiOS SSL-VPN Heap Overflow",
+   "dateAdded": "2026-10-15",
+   "shortDescription": "Heap overflow in FortiOS SSL-VPN allows unauthenticated RCE.",
+   "requiredAction": "Apply updates per vendor instructions.",
+   "dueDate": "2026-11-05",
+   "knownRansomwareCampaignUse": "Known"
+  },
+  {
+   "cveID": "CVE-2020-0001",
+   "vendorProject": "Old",
+   "product": "Thing",
+   "vulnerabilityName": "Old entry outside window",
+   "dateAdded": "2024-01-01",
+   "shortDescription": "x",
+   "requiredAction": "x",
+   "dueDate": "2024-01-22",
+   "knownRansomwareCampaignUse": "Unknown"
+  }
+ ]
+}

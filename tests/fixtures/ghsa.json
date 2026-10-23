@@ -1,0 +1,104 @@
+[
+ {
+  "ghsa_id": "GHSA-2464-fhr4-w9xw",
+  "cve_id": null,
+  "summary": "Next.js: Unauthenticated RCE in Image Optimization API",
+  "description": "## Impact\nNext.js: Unauthenticated RCE in Image Optimization API <script>alert(1)</script>",
+  "published_at": "2026-10-22T15:52:53Z",
+  "severity": "critical",
+  "type": "reviewed",
+  "cvss_severities": {
+   "cvss_v3": {
+    "score": 9.5
+   },
+   "cvss_v4": {
+    "score": null
+   }
+  },
+  "html_url": "https://github.com/advisories/GHSA-2464-fhr4-w9xw",
+  "vulnerabilities": [
+   {
+    "package": {
+     "ecosystem": "npm",
+     "name": "next"
+    },
+    "vulnerable_version_range": ">= 10.0.0, <= 15.5.27",
+    "first_patched_version": "15.5.28"
+   }
+  ],
+  "epss": [
+   {
+    "percentage": 0.0032,
+    "percentile": 0.24
+   }
+  ]
+ },
+ {
+  "ghsa_id": "GHSA-aaaa-bbbb-cccc",
+  "cve_id": "CVE-2026-112398",
+  "summary": "Pillow: Heap buffer overflow in FPX decoding",
+  "description": "## Impact\nPillow: Heap buffer overflow in FPX decoding <script>alert(1)</script>",
+  "published_at": "2026-10-23T21:55:21Z",
+  "severity": "critical",
+  "type": "reviewed",
+  "cvss_severities": {
+   "cvss_v3": {
+    "score": 9.2
+   },
+   "cvss_v4": {
+    "score": null
+   }
+  },
+  "html_url": "https://github.com/advisories/GHSA-aaaa-bbbb-cccc",
+  "vulnerabilities": [
+   {
+    "package": {
+     "ecosystem": "pip",
+     "name": "pillow"
+    },
+    "vulnerable_version_range": "<= 12.3.0",
+    "first_patched_version": "13.0.0"
+   }
+  ],
+  "epss": [
+   {
+    "percentage": 0.0032,
+    "percentile": 0.24
+   }
+  ]
+ },
+ {
+  "ghsa_id": "GHSA-dddd-eeee-ffff",
+  "cve_id": "CVE-2026-109618",
+  "summary": "PHP core RCE (php2shell)",
+  "description": "## Impact\nPHP core RCE (php2shell) <script>alert(1)</script>",
+  "published_at": "2026-10-21T16:00:00Z",
+  "severity": "critical",
+  "type": "reviewed",
+  "cvss_severities": {
+   "cvss_v3": {
+    "score": 9.2
+   },
+   "cvss_v4": {
+    "score": null
+   }
+  },
+  "html_url": "https://github.com/advisories/GHSA-dddd-eeee-ffff",
+  "vulnerabilities": [
+   {
+    "package": {
+     "ecosystem": "composer",
+     "name": "php/php-src"
+    },
+    "vulnerable_version_range": "< 8.4.27",
+    "first_patched_version": "8.4.27"
+   }
+  ],
+  "epss": [
+   {
+    "percentage": 0.0032,
+    "percentile": 0.24
+   }
+  ]
+ }
+]

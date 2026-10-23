@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Security Watch</title>
+  <meta name="description" content="Known exploited and critical vulnerabilities, refreshed every 15 minutes.">
+  <link rel="alternate" type="application/rss+xml" title="Security Watch" href="feed.xml">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 2 4 7v8c0 7.5 5.1 13.6 12 15 6.9-1.4 12-7.5 12-15V7z' fill='%23d6452f'/></svg>">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap top-inner">
+      <div class="brand">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 4 7v8c0 7.5 5.1 13.6 12 15 6.9-1.4 12-7.5 12-15V7z"/></svg>
+        <span>Security Watch</span>
+      </div>
+      <div class="meta">
+        <span id="updated">Loading…</span>
+        <a href="feed.xml">RSS</a>
+        <a href="data.json">JSON</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <p class="lede">Vulnerabilities being exploited or rated critical, pulled from CISA, NVD, GitHub and FIRST EPSS, ranked by what to patch first.</p>
+
+    <section class="stats" aria-label="Summary">
+      <button class="stat act" data-tier="act"><b id="s-act">–</b><span>Act now</span></button>
+      <button class="stat" data-filter="watched"><b id="s-watched">–</b><span>On your watchlist</span></button>
+      <div class="stat"><b id="s-kev">–</b><span>Added to CISA KEV, 7 days</span></div>
+      <div class="stat"><b id="s-crit">–</b><span>New CVSS 9+, 24 hours</span></div>
+      <div class="stat"><b id="s-due">–</b><span>Next CISA deadline</span></div>
+    </section>
+
+    <div class="layout">
+      <section class="list" aria-label="All vulnerabilities">
+        <div class="controls">
+          <input id="q" type="search" placeholder="Search CVE, vendor or product" aria-label="Search">
+          <select id="sort" aria-label="Sort">
+            <option value="priority">Most important</option>
+            <option value="date">Newest</option>
+            <option value="score">Highest CVSS</option>
+            <option value="epss">Most likely exploited</option>
+          </select>
+          <select id="vendor" aria-label="Vendor"><option value="">All vendors</option></select>
+          <div class="tiers" role="group" aria-label="Tier">
+            <button data-t="" class="on">All</button>
+            <button data-t="act">Act</button>
+            <button data-t="watch">Watch</button>
+            <button data-t="fyi">FYI</button>
+          </div>
+          <label class="chk"><input id="hidewp" type="checkbox" checked> Hide WordPress plugins</label>
+          <button id="reset" class="link">Reset</button>
+        </div>
+        <p id="count" class="count"></p>
+        <ol id="rows" class="rows"></ol>
+      </section>
+
+      <aside class="side">
+        <h2>CISA patch-by dates</h2>
+        <ul id="deadlines" class="deadlines"></ul>
+        <h2>How it ranks</h2>
+        <p id="method" class="small"></p>
+        <h2>Sources</h2>
+        <ul class="small sources">
+          <li><a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog">CISA Known Exploited Vulnerabilities</a></li>
+          <li><a href="https://nvd.nist.gov/developers/vulnerabilities">NVD CVE API</a></li>
+          <li><a href="https://github.com/advisories">GitHub Advisory Database</a></li>
+          <li><a href="https://www.first.org/epss/">FIRST EPSS</a></li>
+        </ul>
+      </aside>
+    </div>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

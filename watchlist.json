@@ -1,0 +1,12 @@
+[
+  "sonatype nexus",
+  "github enterprise server",
+  "jenkins",
+  "kubernetes",
+  "nutanix",
+  "rabbitmq",
+  "opensearch",
+  {"vendor": "microsoft", "product": "entra"},
+  {"vendor": "pip", "product": "pillow"},
+  {"vendor": "npm", "product": "next"}
+]

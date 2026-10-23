@@ -1,0 +1,6 @@
+{
+  "_help": "Hand curation merged over the automated feeds. 'patch' edits an existing record by ID, 'items' adds records the feeds don't have (e.g. supply-chain incidents with no CVE), 'suppress' hides IDs. Fields: title, note, pinned, exploited, kind ('malware'), products, url, published.",
+  "patch": {},
+  "items": [],
+  "suppress": []
+}

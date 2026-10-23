@@ -1,0 +1,69 @@
+{
+ "CVE-2026-114625": {
+  "id": "CVE-2026-114625",
+  "published": "2026-10-22T21:17:16.870",
+  "descriptions": [
+   {
+    "lang": "en",
+    "value": "VeloCloud Orchestrator on-prem privilege escalation via SQL injection."
+   }
+  ],
+  "metrics": {
+   "cvssMetricV40": [
+    {
+     "type": "Primary",
+     "cvssData": {
+      "baseScore": 9.4,
+      "baseSeverity": "CRITICAL"
+     }
+    }
+   ]
+  },
+  "configurations": [
+   {
+    "nodes": [
+     {
+      "cpeMatch": []
+     }
+    ]
+   }
+  ]
+ },
+ "CVE-2026-90001": {
+  "id": "CVE-2026-90001",
+  "published": "2026-10-14T12:00:00.000",
+  "descriptions": [
+   {
+    "lang": "en",
+    "value": "A heap-based buffer overflow in FortiOS SSL-VPN may allow a remote unauthenticated attacker to execute code."
+   }
+  ],
+  "metrics": {
+   "cvssMetricV31": [
+    {
+     "type": "Primary",
+     "cvssData": {
+      "baseScore": 9.8,
+      "baseSeverity": "CRITICAL"
+     }
+    }
+   ]
+  },
+  "configurations": [
+   {
+    "nodes": [
+     {
+      "cpeMatch": [
+       {
+        "vulnerable": true,
+        "criteria": "cpe:2.3:o:fortinet:fortios:*:*:*:*:*:*:*:*",
+        "versionStartIncluding": "7.4.0",
+        "versionEndExcluding": "7.4.9"
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

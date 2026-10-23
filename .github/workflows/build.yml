@@ -1,0 +1,64 @@
+name: Build and deploy
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # GitHub runs schedules best-effort; expect some drift
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # NVD lookups, EPSS and download counts are cached between runs so the
+      # 15-minute schedule stays fast and polite to upstream APIs.
+      - uses: actions/cache@v4
+        with:
+          path: .cache
+          key: feeds-${{ github.run_id }}
+          restore-keys: feeds-
+
+      - name: Offline smoke test
+        env:
+          SW_NOW: "2026-10-23T23:00:00Z"
+        run: python scripts/build.py --fixtures tests/fixtures --out /tmp/smoke
+
+      - name: Build from live feeds
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+          SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+        run: python scripts/build.py --out site
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,4 @@
+{
+ "pip:litellm": 4200000,
+ "pip:reqeusts": 12
+}
