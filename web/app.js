@@ -230,6 +230,12 @@ function themes() {
 }
 themes();
 
+// Inside the Android app's WebView, don't offer to download the app.
+if (/; wv\)/.test(navigator.userAgent)) {
+  const el = document.getElementById("get-app");
+  if (el) el.remove();
+}
+
 async function load() {
   try {
     const res = await fetch("data.json", { cache: "no-cache" });
@@ -242,6 +248,11 @@ async function load() {
   }
   header(); syncControls(); wire(); render();
   if (location.hash.length > 1) openRow(decodeURIComponent(location.hash.slice(1)));
+  // Used by the Android app when a notification is tapped while the page is open.
+  window.swOpen = openRow;
+  window.addEventListener("hashchange", () => {
+    if (location.hash.length > 1) openRow(decodeURIComponent(location.hash.slice(1)));
+  });
   // Pick up the next build without a manual reload.
   setInterval(async () => {
     try {

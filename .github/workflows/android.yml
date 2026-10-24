@@ -1,0 +1,72 @@
+name: Android app
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "android/**"
+      - ".github/workflows/android.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write   # publish the GitHub Release
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.11.1"
+
+      # A stable release key means each new APK installs over the old one.
+      # Without it the APK is debug-signed and updates need an uninstall first.
+      - name: Load signing key
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+            echo "SW_KEYSTORE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+          else
+            echo "::warning title=Unsigned build::ANDROID_KEYSTORE_B64 is not set, so this APK is debug-signed"
+          fi
+
+      - name: Build APK
+        working-directory: android
+        env:
+          SW_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          SW_VERSION_CODE: ${{ github.run_number }}
+        run: gradle --no-daemon --stacktrace assembleRelease
+
+      - name: Report build errors
+        if: failure()
+        working-directory: android
+        run: |
+          # Re-run quietly and turn the first compiler/AAPT errors into annotations,
+          # since job logs aren't always reachable.
+          gradle --no-daemon assembleRelease 2>&1 | grep -E "^e: |error:|FAILURE|What went wrong|> " | head -40 | \
+            while IFS= read -r line; do echo "::error title=Gradle::${line}"; done || true
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/release/app-release.apk security-watch.apk
+          tag="android-v${{ github.run_number }}"
+          gh release create "$tag" security-watch.apk \
+            --title "Security Watch for Android (build ${{ github.run_number }})" \
+            --notes "Install on your phone from https://github.com/${{ github.repository }}/releases/latest/download/security-watch.apk. Built from ${GITHUB_SHA::7}." \
+            --latest

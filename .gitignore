@@ -3,3 +3,9 @@ site/
 __pycache__/
 *.pyc
 .DS_Store
+*.jks
+*.keystore
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties

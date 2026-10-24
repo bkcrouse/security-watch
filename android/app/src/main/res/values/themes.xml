@@ -1,0 +1,9 @@
+<resources>
+    <!-- Dark window background so there's no white flash before the page paints. -->
+    <style name="Theme.SecurityWatch" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/bg</item>
+        <item name="android:colorAccent">@color/accent</item>
+        <item name="android:statusBarColor">@color/bg</item>
+        <item name="android:navigationBarColor">@color/bg</item>
+    </style>
+</resources>
