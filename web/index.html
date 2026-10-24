@@ -10,27 +10,27 @@
     // Apply the saved theme before first paint so there's no flash.
     try { var t = localStorage.getItem("security-watch:theme"); if (t === "medium" || t === "light") document.documentElement.dataset.theme = t; } catch (e) {}
   </script>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=dev">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 2 4 7v8c0 7.5 5.1 13.6 12 15 6.9-1.4 12-7.5 12-15V7z' fill='%23d6452f'/></svg>">
 </head>
 <body>
   <header class="top">
     <div class="wrap top-inner">
       <div class="brand">
-        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 4 7v8c0 7.5 5.1 13.6 12 15 6.9-1.4 12-7.5 12-15V7z"/></svg>
+        <svg viewBox="0 0 32 32" width="20" height="20" fill="#d6452f" aria-hidden="true"><path d="M16 2 4 7v8c0 7.5 5.1 13.6 12 15 6.9-1.4 12-7.5 12-15V7z"/></svg>
         <span>Security Watch</span>
       </div>
       <div class="meta">
         <span id="updated">Loading…</span>
         <div class="theme" role="group" aria-label="Theme">
           <button data-theme="dark" aria-pressed="true" aria-label="Dark theme" title="Dark">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/></svg>
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/></svg>
           </button>
           <button data-theme="medium" aria-pressed="false" aria-label="Medium theme" title="Medium">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" class="fill"/></svg>
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" class="fill" fill="currentColor" stroke="none"/></svg>
           </button>
           <button data-theme="light" aria-pressed="false" aria-label="Light theme" title="Light">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>
           </button>
         </div>
         <a href="feed.xml">RSS</a>
@@ -89,6 +89,6 @@
       </aside>
     </div>
   </main>
-  <script src="app.js"></script>
+  <script src="app.js?v=dev"></script>
 </body>
 </html>

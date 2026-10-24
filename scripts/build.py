@@ -812,6 +812,14 @@ def main():
     if out.exists():
         shutil.rmtree(out)
     shutil.copytree(ROOT / "web", out)
+    # Cache-bust: stamp asset URLs with a content hash so a new deploy can't
+    # pair fresh HTML with a stale stylesheet or script from the browser cache.
+    index = out / "index.html"
+    html = index.read_text(encoding="utf-8")
+    for asset in ("style.css", "app.js"):
+        digest = hashlib.sha256((out / asset).read_bytes()).hexdigest()[:10]
+        html = html.replace(f"{asset}?v=dev", f"{asset}?v={digest}")
+    index.write_text(html, encoding="utf-8")
     (out / "data.json").write_text(json.dumps(data, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
     write_rss(data, out / "feed.xml", args.site_url)
     (out / ".nojekyll").write_text("")
