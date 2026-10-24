@@ -239,19 +239,54 @@ def prefetch_npm_downloads(names: list[str]) -> None:
             _NPM_BULK[n] = int((row or {}).get("downloads") or 0)
 
 
+DOWNLOAD_BUDGET_S = 120   # per run; whatever isn't checked now is checked next run
+_dl_started: float | None = None
+
+
+def _dl_cache() -> dict:
+    f = CACHE / "downloads.json"
+    if not hasattr(_dl_cache, "data"):
+        raw = load_json(f, {})
+        cutoff = time.time() - 24 * 3600
+        _dl_cache.data = {k: v for k, v in raw.items() if v.get("t", 0) > cutoff}
+    return _dl_cache.data
+
+
+def save_download_cache():
+    if hasattr(_dl_cache, "data"):
+        (CACHE).mkdir(parents=True, exist_ok=True)
+        (CACHE / "downloads.json").write_text(json.dumps(_dl_cache.data))
+
+
 def monthly_downloads(ecosystem: str, name: str) -> int | None:
+    """Monthly downloads, cached 24 h including misses (404s are most malware)."""
+    global _dl_started
     if ecosystem == "npm" and name in _NPM_BULK:
         return _NPM_BULK[name]
+    key = f"{ecosystem}:{name.lower()}"
+    cache = _dl_cache()
+    if key in cache:
+        return cache[key]["n"]
+    _dl_started = _dl_started or time.time()
+    if time.time() - _dl_started > DOWNLOAD_BUDGET_S:
+        return None
+    n = 0
     try:
         if ecosystem == "npm":
-            d = http_json(NPM_DL + urllib.parse.quote(name, safe="@/"), ttl=24 * 3600)
-            return int(d.get("downloads") or 0)
-        if ecosystem == "pip":
-            d = http_json(PYPI_DL.format(urllib.parse.quote(name.lower())), ttl=24 * 3600)
-            return int((d.get("data") or {}).get("last_month") or 0)
-    except Exception:  # noqa: BLE001 - unknown/removed packages 404
+            d = http_json(NPM_DL + urllib.parse.quote(name, safe="@/"), tries=1)
+            n = int(d.get("downloads") or 0)
+        elif ecosystem == "pip":
+            d = http_json(PYPI_DL.format(urllib.parse.quote(name.lower())), tries=1)
+            n = int((d.get("data") or {}).get("last_month") or 0)
+        else:
+            return None
+    except urllib.error.HTTPError as e:
+        if e.code != 404:          # rate limited etc.: don't cache, retry next run
+            return None
+    except Exception:  # noqa: BLE001
         return None
-    return None
+    cache[key] = {"n": n, "t": time.time()}
+    return n
 
 
 # --------------------------------------------------------------------------
@@ -760,6 +795,7 @@ def main():
     overrides = load_json(ROOT / "overrides.json", {})
     watchlist = load_json(ROOT / "watchlist.json", [])
     data = build(raw, overrides, watchlist)
+    save_download_cache()
     data["sourceErrors"] = SOURCE_ERRORS
     if not data["items"] and SOURCE_ERRORS:
         print("::error::every source failed; not deploying an empty site", flush=True)
