@@ -15,6 +15,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -68,6 +69,21 @@ class MainActivity : Activity() {
 
         askForNotifications()
         FeedWorker.checkNow(this)
+        checkForAppUpdate()
+    }
+
+    /** Toast on open while a newer build exists (network check at most hourly). */
+    private fun checkForAppUpdate() {
+        Thread {
+            val prefs = getSharedPreferences("updates", MODE_PRIVATE)
+            val stale = System.currentTimeMillis() - prefs.getLong("lastCheck", 0) > 60 * 60 * 1000L
+            val newer = runCatching { UpdateChecker.check(applicationContext, force = stale) }.getOrNull()
+            if (newer != null) runOnUiThread {
+                if (!isFinishing) Toast.makeText(
+                    this, "Update available: build $newer. Check your notifications to install.", Toast.LENGTH_LONG
+                ).show()
+            }
+        }.start()
     }
 
     override fun onNewIntent(intent: Intent) {

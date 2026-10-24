@@ -14,6 +14,8 @@ import androidx.core.app.NotificationManagerCompat
 object Notifier {
     private const val CH_ACT = "act"
     private const val CH_WATCH = "watch"
+    private const val CH_UPDATE = "updates"
+    private const val UPDATE_ID = 2
     private const val GROUP = "security-watch"
     private const val SUMMARY_ID = 1
     private const val MAX_INDIVIDUAL = 6
@@ -32,6 +34,33 @@ object Notifier {
                 description = "New entries that match your watchlist"
             }
         )
+        nm.createNotificationChannel(
+            NotificationChannel(CH_UPDATE, "App updates", NotificationManager.IMPORTANCE_DEFAULT).apply {
+                description = "A new version of the app is ready to install"
+            }
+        )
+    }
+
+    /** Tapping opens the APK download in the browser; Android then offers to install it. */
+    fun notifyUpdate(ctx: Context, build: Long) {
+        if (!allowed(ctx)) return
+        val open = PendingIntent.getActivity(
+            ctx, UPDATE_ID,
+            Intent(Intent.ACTION_VIEW, android.net.Uri.parse(UpdateChecker.APK_URL)),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val n = NotificationCompat.Builder(ctx, CH_UPDATE)
+            .setSmallIcon(R.drawable.ic_notify)
+            .setColor(ACCENT)
+            .setContentTitle("Security Watch update available")
+            .setContentText("Build $build is ready. Tap to download and install.")
+            .setContentIntent(open)
+            .setAutoCancel(true)
+            .build()
+        try {
+            NotificationManagerCompat.from(ctx).notify(UPDATE_ID, n)
+        } catch (_: SecurityException) {
+        }
     }
 
     private fun allowed(ctx: Context): Boolean =

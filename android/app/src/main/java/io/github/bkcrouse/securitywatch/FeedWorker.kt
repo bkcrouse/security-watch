@@ -47,6 +47,8 @@ class FeedWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx, 
                 .putStringSet(KEY_SEEN, currentKeys)
                 .putLong(KEY_LAST_OK, System.currentTimeMillis())
                 .apply()
+            // Piggyback the (throttled) app update check on the feed check.
+            runCatching { UpdateChecker.check(applicationContext) }
             Result.success()
         } catch (e: Exception) {
             Log.w(TAG, "feed check failed", e)

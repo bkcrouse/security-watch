@@ -148,6 +148,17 @@ button.stat:hover { border-color: var(--muted); }
 .sources { padding-left: 18px; margin: 0; }
 .empty { padding: 30px; text-align: center; color: var(--muted); }
 
+.toast { position: fixed; left: 16px; right: 16px; bottom: 20px; margin: 0 auto; width: fit-content; z-index: 20;
+         display: flex; align-items: center; gap: 10px;
+         max-width: 560px; padding: 11px 14px; border-radius: 10px; cursor: pointer;
+         background: var(--ink); color: var(--bg); border: 0; font: 500 14px/1.35 var(--sans); text-align: left;
+         box-shadow: 0 8px 30px rgba(0,0,0,.35); opacity: 0; transform: translateY(12px);
+         transition: opacity .25s ease, transform .25s ease; }
+.toast.show { opacity: 1; transform: none; }
+.toast-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none; }
+.toast-x { margin-left: 6px; opacity: .6; font-size: 18px; line-height: 1; padding: 0 2px; }
+@media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+
 @media (max-width: 960px) {
   .layout { grid-template-columns: 1fr; }
   .side { position: static; }

@@ -148,13 +148,17 @@ function render() {
   document.querySelectorAll(".tiers button").forEach((b) => b.classList.toggle("on", b.dataset.t === state.tier));
 }
 
-function header() {
+function stats() {
   const s = DATA.summary;
   $("#s-act").textContent = s.actNow;
   $("#s-watched").textContent = s.watched;
   $("#s-kev").textContent = s.exploited7d;
   $("#s-crit").textContent = s.critical24h;
   $("#s-due").textContent = s.nextDue ? s.nextDue.slice(5) : "none";
+}
+
+function header() {
+  stats();
   const upd = $("#updated");
   upd.textContent = `Updated ${ago(DATA.generated)}`;
   upd.title = DATA.generated;
@@ -254,13 +258,58 @@ async function load() {
     if (location.hash.length > 1) openRow(decodeURIComponent(location.hash.slice(1)));
   });
   // Pick up the next build without a manual reload.
-  setInterval(async () => {
-    try {
-      const r = await fetch("data.json", { cache: "no-cache" });
-      const fresh = await r.json();
-      if (fresh.generated !== DATA.generated) { DATA = fresh; $("#updated").textContent = `Updated ${ago(DATA.generated)}`; render(); }
-      else $("#updated").textContent = `Updated ${ago(DATA.generated)}`;
-    } catch (_) {}
-  }, 5 * 60 * 1000);
+  setInterval(refresh, 5 * 60 * 1000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
+}
+
+// Keys for things worth announcing: newly "act now" or newly on the watchlist.
+const alertKeys = (items) => new Set(items.flatMap((r) =>
+  [r.tier === "act" ? "act:" + r.id : null, r.watched ? "watch:" + r.id : null].filter(Boolean)));
+
+let refreshing = false;
+async function refresh() {
+  if (refreshing || !DATA) return;
+  refreshing = true;
+  try {
+    const r = await fetch("data.json", { cache: "no-cache" });
+    const fresh = await r.json();
+    if (fresh.generated !== DATA.generated) {
+      const before = alertKeys(DATA.items);
+      const newIds = [...new Set([...alertKeys(fresh.items)].filter((k) => !before.has(k)).map((k) => k.split(":").slice(1).join(":")))];
+      DATA = fresh;
+      stats();
+      render();
+      if (newIds.length) {
+        const acts = fresh.items.filter((x) => newIds.includes(x.id) && x.tier === "act").length;
+        const first = fresh.items.find((x) => newIds.includes(x.id));
+        toast(newIds.length === 1
+          ? `New: ${label(first)} — ${shortTitle(first)}`
+          : `${newIds.length} new${acts ? `, ${acts} to act on now` : " on your watchlist"}`,
+          () => openRow(first.id));
+      }
+    }
+    $("#updated").textContent = `Updated ${ago(DATA.generated)}`;
+  } catch (_) {
+    /* offline or mid-deploy; try again next tick */
+  } finally {
+    refreshing = false;
+  }
+}
+
+function toast(text, onClick) {
+  const old = document.querySelector(".toast");
+  if (old) old.remove();
+  const el = h("button", { class: "toast", type: "button" },
+    h("span", { class: "toast-dot", "aria-hidden": "true" }),
+    h("span", { text }),
+    h("span", { class: "toast-x", "aria-hidden": "true", text: "×" }));
+  el.setAttribute("role", "status");
+  el.addEventListener("click", (e) => {
+    el.remove();
+    if (!e.target.classList.contains("toast-x") && onClick) onClick();
+  });
+  document.body.append(el);
+  requestAnimationFrame(() => el.classList.add("show"));
+  setTimeout(() => { el.classList.remove("show"); setTimeout(() => el.remove(), 300); }, 12000);
 }
 load();
