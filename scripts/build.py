@@ -690,6 +690,8 @@ def build(raw: dict, overrides: dict, watchlist: list) -> dict:
             "critical24h": sum((r["score"] or 0) >= 9 and (published_dt(r) or NOW - dt.timedelta(days=9)) >= day_ago
                                for r in items),
             "watched": sum(r["watched"] for r in items),
+            "total": len(items),
+            "byTier": {t: sum(r["tier"] == t for r in items) for t in ("act", "watch", "fyi")},
             "nextDue": upcoming[0]["kevDue"] if upcoming else "",
         },
         "deadlines": [{"id": r["id"], "due": r["kevDue"], "vendor": r["vendor"], "product": r["product"]}
@@ -730,6 +732,7 @@ def write_rss(data: dict, path: Path, site_url: str):
 
 
 SOURCE_ERRORS: list[str] = []
+SOURCE_COUNTS: dict[str, int] = {}
 
 
 def describe(e: Exception) -> str:
@@ -749,6 +752,7 @@ def attempt(name: str, fn, default):
     try:
         out = fn()
         n = len(out.get("vulnerabilities", [])) if isinstance(out, dict) else len(out)
+        SOURCE_COUNTS[name] = n
         print(f"  {name}: {n} records in {time.time() - t0:.0f}s", file=sys.stderr)
         return out
     except Exception as e:  # noqa: BLE001
@@ -797,6 +801,9 @@ def main():
     data = build(raw, overrides, watchlist)
     save_download_cache()
     data["sourceErrors"] = SOURCE_ERRORS
+    data["sourceCounts"] = SOURCE_COUNTS
+    # Keep the useful bits first so a truncated read still shows them.
+    data = {k: data[k] for k in ("generated", "refreshMinutes", "summary", "sourceCounts", "sourceErrors")} | data
     if not data["items"] and SOURCE_ERRORS:
         print("::error::every source failed; not deploying an empty site", flush=True)
         sys.exit(1)
